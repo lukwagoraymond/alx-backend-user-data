@@ -10,8 +10,7 @@ import mysql.connector
 PII_FIELDS = ('name', 'email', 'phone', 'password', 'ssn')
 
 
-def filter_datum(fields: List[str],
-                 redaction: str, message: str,
+def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """Replaces sensitive information in a message log
     with a redacted value based on the list of fields to
@@ -23,18 +22,6 @@ def filter_datum(fields: List[str],
         separator: the separator to use between fields
     Returns:
         The filtered string message with redacted values"""
-    """x = message.rsplit(separator)
-        x_len = len(x)
-
-        for k_val in range(x_len - 1):
-            for checks in fields:
-                if x[k_val].startswith(checks):
-                    y_list = x[k_val].rsplit('=')
-                    x[k_val] = x[k_val].replace(y_list[1], redaction)
-                else:
-                    continue
-        x = separator.join(x)
-        return x"""
     for field in fields:
         message = re.sub(f'{field}=(?<==)[^;]+{separator}',
                          f'{field}={redaction}{separator}', message)
