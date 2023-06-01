@@ -55,10 +55,11 @@ def req_filter():
                           '/api/v1/auth_session/login/']
         state_path = auth.require_auth(req_path, exclusion_path)
         if state_path is True:
-            auth_header = auth.authorization_header(request)
-            user = auth.current_user(request)
-            if auth.authorization_header(request) is None\
-                    and auth.session_cookie(request) is None:
+            if auth.authorization_header(request) is not None \
+                    and auth.session_cookie(request) is not None:
+                auth_header = auth.authorization_header(request)
+                user = auth.current_user(request)
+            else:
                 abort(401)
             if auth_header is None:
                 abort(401)
