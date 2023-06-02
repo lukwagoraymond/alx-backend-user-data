@@ -37,7 +37,8 @@ class SessionDBAuth(SessionExpAuth):
             if session_id:
                 if super().destroy_session(request):
                     try:
-                        sessions = UserSession.search({'session_id': session_id})
+                        sessions = UserSession.search(
+                            {'session_id': session_id})
                         for session in sessions:
                             session.remove()
                             return True
