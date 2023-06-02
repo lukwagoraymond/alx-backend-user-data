@@ -9,7 +9,7 @@ class SessionDBAuth(SessionExpAuth):
     """A class that inherits from Session Expiration
     and contains DB Storage Authentication Methods"""
 
-    def create_session(self, user_id=None):
+    def create_session(self, user_id=None) -> str:
         """Creates and Stores a new object of UserSession
         then returns a session ID"""
         session_id = super().create_session(user_id)
@@ -29,15 +29,20 @@ class SessionDBAuth(SessionExpAuth):
             return None
         return sessions[0].user_id
 
-    def destroy_session(self, request=None):
+    def destroy_session(self, request=None) -> bool:
         """Method Destroys a user session based on a session ID
         from a request cookie"""
-        session_id = self.session_cookie(request)
-        try:
-            sessions = UserSession.search({'session_id': session_id})
-        except Exception:
-            return False
+        if request:
+            session_id = self.session_cookie(request)
+            if session_id:
+                if super().destroy_session(request):
+                    try:
+                        sessions = UserSession.search({'session_id': session_id})
+                        for session in sessions:
+                            session.remove()
+                            return True
+                    except Exception:
+                        return False
         if len(sessions) <= 0:
             return False
-        sessions.clear()
-        return True
+        return False
