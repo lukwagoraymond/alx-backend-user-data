@@ -2,3 +2,4 @@ auth-env/
 main.py
 .db_User.json
 .idea
+.db_UserSession.json
