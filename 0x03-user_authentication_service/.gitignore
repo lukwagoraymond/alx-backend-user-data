@@ -1,0 +1,4 @@
+a.db
+auth-env/
+__pycache__/
+.idea/
