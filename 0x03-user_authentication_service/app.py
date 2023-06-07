@@ -2,7 +2,6 @@
 """Module contains Flask App"""
 
 from flask import Flask, jsonify, request, make_response, abort, redirect, url_for
-
 from auth import Auth
 
 AUTH = Auth()
@@ -52,6 +51,46 @@ def logout() -> str:
         return redirect(url_for('/'))
     else:
         abort(403)
+
+
+@app.route('/profile', methods=['GET'])
+def profile() -> str:
+    """based on the session_id returns user obj email"""
+    session_id = request.cookies.get('session_id')
+    user_obj = AUTH.get_user_from_session_id(session_id)
+    if user_obj is not None:
+        return jsonify({"email": user_obj.email}), 200
+    else:
+        return abort(403)
+
+
+@app.route('/reset_password', method=['POST'])
+def get_reset_password_token() -> str:
+    """checks for email & generates token"""
+    email = request.form.get('email')
+    try:
+        token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": token}), 200
+    except Exception:
+        abort(403)
+
+
+@app.route('/reset_password', methods=['PUT'], strict_slashes=False)
+def update_password() -> str:
+    """for a corresponding user to an email, reset_token
+    update the password"""
+    email = request.form.get('email')
+    reset_token = request.form.get('reset_token')
+    new_password = request.form.get('new_password')
+    boolean_cheaker = False
+    try:
+        AUTH.update_password(reset_token, new_password)
+        boolean_cheaker = True
+    except ValueError:
+        boolean_cheaker = False
+    if not boolean_cheaker:
+        abort(403)
+    return jsonify({"email": email, "message": "Password updated"}), 200
 
 
 if __name__ == "__main__":
