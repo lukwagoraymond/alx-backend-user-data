@@ -83,7 +83,7 @@ def update_password(email: str, reset_token: str, new_password: str) -> None:
                'new_password': new_password,
                }
     resp = requests.put('http://127.0.0.1:5000/reset_password', data=payload)
-    assert resp.status_code == 201
+    assert resp.status_code == 200
     assert resp.json() == {"email": email, "message": "Password updated"}
 
 
