@@ -43,7 +43,7 @@ class DB:
             user_obj = None
         return user_obj
 
-    def find_user_by(self, **kwargs: dict) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """method takes in arbitrary keyword arguments
         and returns the 1st row found in the user tables"""
         for key, val in kwargs.items():
