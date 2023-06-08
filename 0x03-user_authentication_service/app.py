@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Module contains Flask App"""
 
-from flask import Flask, jsonify, request, make_response, abort, redirect, url_for
+from flask import Flask, jsonify, \
+    request, make_response, abort, \
+    redirect
 from auth import Auth
 
 AUTH = Auth()
@@ -15,19 +17,20 @@ def home_page() -> str:
     return jsonify({"message": "Bienvenue"})
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/users', methods=['POST'], strict_slashes=False)
 def users() -> str:
     """_summary_ creation of users"""
     email = request.form.get('email')
     password = request.form.get('password')
     try:
         user_obj = AUTH.register_user(email, password)
-        return jsonify({"email": user_obj.email, "message": "user created"}), 200
+        return jsonify({"email": user_obj.email,
+                        "message": "user created"}), 200
     except Exception:
         return jsonify({"message": "email already registered"}), 400
 
 
-@app.route('/sessions', methods=['POST'])
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
 def login() -> str:
     """logins in user and creates a session_id"""
     email = request.form.get('email')
@@ -41,19 +44,19 @@ def login() -> str:
     return abort(401)
 
 
-@app.route('/sessions', methods=['DELETE'])
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def logout() -> str:
     """logouts a user out of a session & redirects to home-page"""
     session_id = request.cookies.get('session_id')
     user_obj = AUTH.get_user_from_session_id(session_id)
     if user_obj is not None:
         AUTH.destroy_session(user_obj.id)
-        return redirect(url_for('/'))
+        return redirect('/')
     else:
         abort(403)
 
 
-@app.route('/profile', methods=['GET'])
+@app.route('/profile', methods=['GET'], strict_slashes=False)
 def profile() -> str:
     """based on the session_id returns user obj email"""
     session_id = request.cookies.get('session_id')
@@ -64,7 +67,7 @@ def profile() -> str:
         return abort(403)
 
 
-@app.route('/reset_password', method=['POST'])
+@app.route('/reset_password', methods=['POST'], strict_slashes=False)
 def get_reset_password_token() -> str:
     """checks for email & generates token"""
     email = request.form.get('email')
@@ -82,15 +85,11 @@ def update_password() -> str:
     email = request.form.get('email')
     reset_token = request.form.get('reset_token')
     new_password = request.form.get('new_password')
-    boolean_cheaker = False
     try:
         AUTH.update_password(reset_token, new_password)
-        boolean_cheaker = True
-    except ValueError:
-        boolean_cheaker = False
-    if not boolean_cheaker:
+        return jsonify({"email": email, "message": "Password updated"}), 201
+    except Exception:
         abort(403)
-    return jsonify({"email": email, "message": "Password updated"}), 200
 
 
 if __name__ == "__main__":

@@ -35,7 +35,8 @@ class Auth:
             self._db.find_user_by(email=email)
         except NoResultFound:
             hashed_passwrd = _hash_password(password)
-            user_obj = self._db.add_user(email=email, hashed_password=hashed_passwrd)
+            user_obj = self._db.add_user(email=email,
+                                         hashed_password=hashed_passwrd)
             return user_obj
         else:
             raise ValueError(f'User {email} already exists')
@@ -98,7 +99,9 @@ class Auth:
         try:
             user_obj = self._db.find_user_by(reset_token=reset_token)
             hashed_passwrd = _hash_password(password)
-            self._db.update_user(user_obj.id, hashed_passwrd=hashed_passwrd, reset_token=None)
+            self._db.update_user(user_obj.id,
+                                 hashed_password=hashed_passwrd,
+                                 reset_token=None)
             return None
         except NoResultFound:
             raise ValueError
